@@ -15,17 +15,30 @@ class TransferMoney extends StatefulWidget {
     required this.senderName,
     required this.currentUserCardNumebr,
   });
+
   @override
   _TransferMoneyState createState() => _TransferMoneyState();
 }
 
 class _TransferMoneyState extends State<TransferMoney> {
   double _currentBalance = 0.0;
-  DatabaseHelper _dbHelper = new DatabaseHelper();
+  DatabaseHelper _dbHelper = DatabaseHelper();
 
   @override
   void initState() {
     super.initState();
+    _currentBalance = widget.currentBalance;
+  }
+
+  @override
+  void didUpdateWidget(covariant TransferMoney oldWidget) {
+    // This method is called whenever the parent widget changes
+    super.didUpdateWidget(oldWidget);
+    if (widget.currentBalance != _currentBalance) {
+      setState(() {
+        _currentBalance = widget.currentBalance;
+      });
+    }
   }
 
   @override
@@ -52,14 +65,12 @@ class _TransferMoneyState extends State<TransferMoney> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      _currentBalance == widget.currentBalance
-                          ? "Rp 0"
-                          : "Rp ${widget.currentBalance}",
+                      "Rp $_currentBalance",
                       style: Theme.of(context).textTheme.headline4?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: _currentBalance == widget.currentBalance
-                                ? Colors.red
-                                : Colors.green,
+                                ? Colors.green
+                                : Colors.red,
                           ),
                     ),
                   ],
@@ -82,8 +93,9 @@ class _TransferMoneyState extends State<TransferMoney> {
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => Payment(
-                              customerAvatar: snapshot.data![index].userName[0],
-                              customerName: snapshot.data![index].userName,
+                              customerAvatar:
+                                  snapshot.data![index].nama[0], // Handle null
+                              customerName: snapshot.data![index].nama,
                               senderName: widget.senderName,
                               customerAccountNumber:
                                   snapshot.data![index].cardNumber,
@@ -91,16 +103,19 @@ class _TransferMoneyState extends State<TransferMoney> {
                                   widget.currentUserCardNumebr,
                               currentCustomerId: widget.currentCustomerId,
                               currentUserBalance: widget.currentBalance,
-                              transferTouserId: snapshot.data![index].id,
+                              transferTouserId: snapshot
+                                  .data![index].transactionId, // Handle null
                               tranferTouserCurrentBalance:
                                   snapshot.data![index].totalAmount,
                             ),
                           ),
                         ),
                         child: CustomerList(
-                          customerName: snapshot.data![index].userName,
+                          customerName: snapshot.data![index].nama,
                           currentBalance: snapshot.data![index].totalAmount,
-                          avatar: snapshot.data![index].userName[0], transactionDate: '',
+                          avatar: snapshot.data![index].nama[0],
+                          transactionDate:
+                              '',
                         ),
                       );
                     },
@@ -114,5 +129,3 @@ class _TransferMoneyState extends State<TransferMoney> {
     );
   }
 }
-
-// ₹

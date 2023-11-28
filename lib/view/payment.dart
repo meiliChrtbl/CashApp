@@ -94,7 +94,7 @@ class _PaymentState extends State<Payment> {
             ],
           ),
           Spacer(),
-          Flexible(
+          Expanded(
             child: Container(
               width: double.infinity,
               height: 150,
@@ -193,15 +193,14 @@ class _PaymentState extends State<Payment> {
 
                             TransactionDetails _transactionDetails =
                                 TransactionDetails(
-                              id: 0,
+                              id: widget.currentCustomerId,
                               transactionId: widget.currentCustomerId,
-                              userName: widget.customerName,
+                              nama: widget.customerName,
                               senderName: widget.senderName,
                               transactionAmount: transferAmount,
                             );
 
-                            await _dbHelper
-                                .insertTransactionHistroy(_transactionDetails);
+                            await _dbHelper.insertTransactionHistroy(_transactionDetails);
 
                             showDialog(
                                 context: context,

@@ -8,7 +8,6 @@ import 'package:uasapp/data/cardData.dart';
 import 'package:uasapp/model/constant.dart';
 import 'package:uasapp/view/addCardDetails.dart';
 
-
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -16,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   DatabaseHelper _dbhelper = new DatabaseHelper();
-  String userName = "Hello! ";
+  String nama = "Hello! ";
   String avatar = "H";
   DateTime currentTime = DateTime.now();
   List<String> greetingList = [
@@ -44,13 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Handling indicator
   List<T> map<T>(List list, Function handler) {
     List<T> result = [];
     for (var i = 0; i < list.length; i++) {
       result.add(handler(i, list[i]));
     }
-
     return result;
   }
 
@@ -59,7 +56,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _list = CardData.cardDataList;
 
     getGreeting();
+
+    // Wait for the database to be fully initialized before querying
+    Future.delayed(Duration.zero, () {
+      _loadTransactionDetails();
+    });
+
     super.initState();
+  }
+
+  void _loadTransactionDetails() async {
+    try {
+      final transactionDetails = await _dbhelper.getTransactionDetatils();
+      // Handle the loaded transaction details as needed
+    } catch (e) {
+      print('Error loading transaction details: $e');
+      // Handle the error
+    }
   }
 
   @override
@@ -105,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.grey,
                             fontSize: 18,
                           )),
-                  Text(userName,
+                  Text(nama,
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
                             color: mgBlackColor,
                             fontWeight: FontWeight.bold,
@@ -133,18 +146,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       return GestureDetector(
                         onTap: () {
                           setState(() => {
-                                userName = snapshot.data![index].userName,
-                                avatar = snapshot.data![index].userName[0],
+                                nama = snapshot.data![index].nama,
+                                avatar = snapshot.data![index].nama[0],
                               });
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => TransferMoney(
-                                currentBalance:
-                                    snapshot.data![index].totalAmount,
-                                currentCustomerId: snapshot.data![index].id,
-                                currentUserCardNumebr:
-                                    snapshot.data![index].cardNumber,
-                                senderName: snapshot.data![index].userName,
+                                currentBalance: snapshot.data?[index]?.totalAmount ?? 0,
+                                currentCustomerId: snapshot.data![index].id ?? 0,
+                                currentUserCardNumebr: snapshot.data![index].cardNumber,
+                                senderName: snapshot.data![index].nama,
                               ),
                             ),
                           );
@@ -152,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: UserATMCard(
                           cardNumber: snapshot.data![index].cardNumber,
                           cardExpiryDate: snapshot.data![index].cardExpiry,
-                          totalAmount: snapshot.data![index].totalAmount,
+                          totalAmount: snapshot.data?[index]?.totalAmount ?? 0,
                           gradientColor: _list[index].mgPrimaryGradient, cardHolderName: '',
                         ),
                       );
@@ -237,30 +248,39 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            Container(
-              child: FutureBuilder(
-                initialData: [],
-                future: _dbhelper.getTransactionDetatils(),
-                builder: (context, snapshot) {
+          Container(
+            child: FutureBuilder(
+              initialData: [],
+              future: _dbhelper.getTransactionDetatils(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                  return Text('No transaction data available.');
+                } else {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: mgDefaultPadding),
+                    padding: const EdgeInsets.symmetric(horizontal: mgDefaultPadding),
                     itemBuilder: (context, index) {
                       return TransactionHistroy(
                         isTransfer: true,
-                        customerName: snapshot.data![index].userName,
+                        customerName: snapshot.data![index].nama,
                         transferAmount: snapshot.data![index].transactionAmount,
                         senderName: snapshot.data![index].senderName,
-                        avatar: snapshot.data![index].userName[0],
+                        avatar: snapshot.data![index].nama[0],
                       );
                     },
                   );
-                },
-              ),
+                }
+              },
             ),
+          ),
+
+
           ],
         ),
       ),

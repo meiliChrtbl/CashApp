@@ -74,8 +74,8 @@ class _TransactionHistroyState extends State<TransactionHistroy> {
             children: [
               Text(
                 widget.isTransfer
-                    ? '+ ₹ ${widget.transferAmount}'
-                    : '- ₹ ${widget.transferAmount}',
+                    ? '+ Rp ${widget.transferAmount}'
+                    : '- Rp ${widget.transferAmount}',
                 style: Theme.of(context).textTheme.subtitle1!.copyWith(
                     color: widget.isTransfer ? Colors.green : Colors.red,
                     fontWeight: FontWeight.w500),

@@ -1,28 +1,25 @@
 class TransactionDetails {
-  final int id;
-  final int transactionId;
-  final String userName;
-  final String senderName;
-  final double transactionAmount;
-  // final bool transactionDone;
+  final int? id;
+  final int? transactionId;
+  final String? nama;
+  final String? senderName;
+  final double? transactionAmount;
 
   TransactionDetails({
-    required this.id,
-    required this.transactionId,
-    required this.userName,
-    required this.transactionAmount,
-    required this.senderName,
-    // this.transactionDone,
+    this.id,
+    this.transactionId,
+    this.nama,
+    this.transactionAmount,
+    this.senderName,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'transactionId': transactionId,
-      'userName': userName,
+      'nama': nama,
       'senderName': senderName,
       'transactionAmount': transactionAmount,
-      // 'transactionDone': transactionDone,
     };
   }
 }

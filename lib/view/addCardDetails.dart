@@ -62,7 +62,7 @@ class _AddCardDetailsState extends State<AddCardDetails> {
                         onPressed: () async {
                           if (cardHolderName.isNotEmpty) {
                             UserData _userData = UserData(
-                              userName: cardHolderName,
+                              nama: cardHolderName,
                               cardNumber: cardNumber,
                               cardExpiry: cardExpiry,
                               totalAmount: currentBalance,

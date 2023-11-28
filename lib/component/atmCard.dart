@@ -84,7 +84,7 @@ class _UserATMCardState extends State<UserATMCard> {
             left: 29,
             bottom: 20,
             child: Text(
-              "₹ ${widget.totalAmount}",
+              "Rp ${widget.totalAmount}",
               style: Theme.of(context).textTheme.headline1?.copyWith(
                     color: Colors.white,
                     fontSize: 22,
